@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AirWatch — Monitoring Kualitas Udara · Informatika Untan</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Lora:ital,wght@0,400;0,500;0,600;1,400&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+<script src="script.js" defer></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+</head>
+<body>
+<!-- ANIMATED BACKGROUND -->
+<div class="bg-scene">
+  <div class="bg-grad"></div>
+  <div class="orb o1"></div>
+  <div class="orb o2"></div>
+  <div class="orb o3"></div>
+  <div class="orb o4"></div>
+  <div class="orb o5"></div>
+  <div class="bg-noise"></div>
+</div>
+
+<div class="sb-backdrop" id="sb-backdrop"></div>
+
+<!-- HEADER -->
+<div class="header">
+  <div class="hdr-left">
+    <div class="sb-toggle" id="sb-toggle" title="Toggle Sidebar">
+      <i class="fas fa-bars" id="sb-toggle-ico"></i>
+    </div>
+    <div class="logo-gem"><i class="fas fa-wind"></i></div>
+    <div class="brand-wrap">
+      <div class="brand-name">Sistem Monitoring Kualitas Udara</div>
+      <div class="brand-loc"><i class="fas fa-map-marker-alt"></i>Informatika — Universitas Tanjungpura, Pontianak</div>
+    </div>
+  </div>
+  <div class="hdr-right">
+    <!-- Language Switch -->
+    <div class="lang-switch" id="lang-switch" title="Switch Language">
+      <span class="lang-opt active" data-lang="id" title="Bahasa Indonesia">🇮🇩</span>
+      <span class="lang-opt" data-lang="en" title="English">🇬🇧</span>
+    </div>
+    <!-- Dark Mode Toggle -->
+    <div class="dm-toggle" id="dm-toggle" title="Toggle Dark Mode">
+      <i class="fas fa-moon" id="dm-icon"></i>
+    </div>
+    <div class="live-pill"><div class="ldot"></div><span data-i18n="live">Live</span></div>
+    <div class="hclock" id="datetime">--</div>
+  </div>
+</div>
+
+<!-- WRAP -->
+<div class="wrap">
+
+<!-- SIDEBAR (desktop) -->
+<div class="sidebar" id="sidebar">
+  <div class="nav-sec">
+    <div class="nav-lbl" data-i18n="nav_main">Main Menu</div>
+    <div class="nitem active" data-page="dashboard"><i class="fas fa-chart-line"></i> <span data-i18n="nav_dashboard">Dashboard</span></div>
+    <div class="nitem" data-page="sensors"><i class="fas fa-microchip"></i> <span data-i18n="nav_sensors">Sensors</span></div>
+    <div class="nitem" data-page="history"><i class="fas fa-history"></i> <span data-i18n="nav_history">History</span></div>
+    <div class="nitem" data-page="alerts"><i class="fas fa-bell"></i> <span data-i18n="nav_alerts">Alerts</span></div>
+  </div>
+  <div class="nav-sec">
+    <div class="nav-lbl" data-i18n="nav_info">Info</div>
+    <div class="nitem" data-page="config"><i class="fas fa-cog"></i> <span data-i18n="nav_config">Configuration</span></div>
+    <div class="nitem" data-page="about"><i class="fas fa-info-circle"></i> <span data-i18n="nav_about">About</span></div>
+  </div>
+  <div class="sb-footer">
+    <div class="sbf-t">🎓 Kerja Praktik IoT</div>
+    <div class="sbf-s">Teknik Informatika<br>Monitoring Kualitas Udara</div>
+  </div>
+</div>
+
+<!-- CONTENT -->
+<div class="content" id="content">
+
+<!-- ======================================================
+     PAGE: DASHBOARD
+====================================================== -->
+<div class="page active" id="page-dashboard">
+  <div class="ph">
+    <div class="ph-title" data-i18n="dash_title">Dashboard Overview</div>
+    <div class="ph-desc" data-i18n="dash_desc">Pemantauan kualitas udara Informatika Untan secara real-time</div>
+  </div>
+
+  <!-- AQI HERO CARD — MAIN PRIORITY -->
+  <div class="aqi-hero aq-good" id="aqi-hero">
+    <div class="aqi-orb aq-good" id="aqi-orb"><i class="fas fa-leaf" id="aqi-icon"></i></div>
+    <div class="aqi-body">
+      <div class="aqi-eyebrow" data-i18n="aqi_eyebrow">Kualitas Udara Saat Ini</div>
+      <div class="aqi-score-row">
+        <div class="aqi-score score-good" id="aqi-score">--</div>
+        <div class="aqi-score-unit">PPM</div>
+      </div>
+      <div class="aqi-cat-badge badge-good" id="aqi-cat-badge">
+        <i class="fas fa-check-circle"></i>&nbsp;Good
+      </div>
+      <div class="aqi-summary" id="aqi-summary">Kualitas udara sangat baik dan aman untuk semua aktivitas.</div>
+      <div class="aqi-update"><i class="fas fa-clock"></i><span id="last-update">Memuat…</span></div>
+    </div>
+    <div class="aqi-right">
+      <div class="aqi-mlbl">Indeks Gas (0–500)</div>
+      <div class="aqi-track"><div class="aqi-fill aq-good" id="aqi-fill"></div></div>
+      <div class="aqi-nums"><span>0</span><span>100</span><span>200</span><span>300</span><span>500+</span></div>
+      <div class="aqi-scale-labels">
+        <div class="aqi-scale-dot asd-g" title="Good"></div>
+        <div class="aqi-scale-dot asd-m" title="Moderate"></div>
+        <div class="aqi-scale-dot asd-p" title="Poor"></div>
+        <div class="aqi-scale-dot asd-u" title="Unhealthy"></div>
+        <div class="aqi-scale-dot asd-s" title="Severe"></div>
+        <div class="aqi-scale-dot asd-h" title="Hazardous"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- METRIC CARDS — 3 EQUAL -->
+  <div class="mcgrid">
+    <!-- Temperature -->
+    <div class="mcard mc-temp">
+      <div class="mcard-hd">
+        <div class="mcard-ico ico-temp-normal" id="ico-temp"><i class="fas fa-temperature-high"></i></div>
+        <div class="mbadge mb-ok" id="badge-temp">Pleasant</div>
+      </div>
+      <div class="mcard-lbl">Temperature</div>
+      <div class="mcard-val" id="temp">--&thinsp;<span class="mcard-unit">°C</span></div>
+      <div class="mcard-spark"><canvas id="spark-temp" height="36"></canvas></div>
+    </div>
+    <!-- Humidity -->
+    <div class="mcard mc-hum">
+      <div class="mcard-hd">
+        <div class="mcard-ico ico-hum-normal" id="ico-hum"><i class="fas fa-droplet"></i></div>
+        <div class="mbadge mb-ok" id="badge-hum">Optimal</div>
+      </div>
+      <div class="mcard-lbl">Humidity</div>
+      <div class="mcard-val" id="hum">--&thinsp;<span class="mcard-unit">%</span></div>
+      <div class="mcard-spark"><canvas id="spark-hum" height="36"></canvas></div>
+    </div>
+    <!-- Gas -->
+    <div class="mcard mc-gas" id="mc-gas-card">
+      <div class="mcard-hd">
+        <div class="mcard-ico ico-gas-good" id="ico-gas"><i class="fas fa-smog"></i></div>
+        <div class="mbadge mb-ok" id="badge-gas">Good</div>
+      </div>
+      <div class="mcard-lbl" data-i18n="lbl_gas">Gas Level (Indeks Gas)</div>
+      <div class="mcard-val" id="gas">--&thinsp;<span class="mcard-unit">PPM</span></div>
+      <div class="mcard-spark"><canvas id="spark-gas" height="36"></canvas></div>
+    </div>
+  </div>
+
+  <!-- CHART + LEGEND -->
+  <div class="bottom-grid">
+    <div class="cbox">
+      <div class="cbox-hd">
+        <div>
+          <div class="cbox-title" data-i18n="chart_title">Tren Sensor — 24 Jam</div>
+          <div class="cbox-sub" data-i18n="chart_sub">Data real-time setiap 3 detik</div>
+        </div>
+        <div class="cstat"><div class="cstat-v" id="chart-latest">--</div><div class="cstat-l" data-i18n="tog_gas">Indeks Gas</div></div>
+      </div>
+      <!-- Toggles -->
+      <div class="chart-toggles">
+        <div class="ctog tog-aq active"   id="tog-aq"  ><div class="ctog-dot dot-aq"></div><span data-i18n="tog_gas">Indeks Gas</span></div>
+        <div class="ctog tog-temp inactive" id="tog-temp"><div class="ctog-dot dot-temp"></div><span data-i18n="tog_temp">Suhu °C</span></div>
+        <div class="ctog tog-hum inactive"  id="tog-hum" ><div class="ctog-dot dot-hum"></div><span data-i18n="tog_hum">Kelembapan %</span></div>
+      </div>
+      <div class="chart-wrap"><canvas id="main-chart"></canvas></div>
+    </div>
+    <div class="ipanel">
+      <div class="ip-title"><i class="fas fa-shield-alt"></i> <span data-i18n="cat_title">Kategori Kualitas Udara</span></div>
+      <div class="tier tg"> <div class="tdot"></div><div class="tinfo"><h4><span data-i18n="cat_lbl_good">Good</span> &nbsp;(0–50)</h4>        <p data-i18n="cat_good">Kualitas udara sangat memuaskan, aman</p></div></div>
+      <div class="tier tm"> <div class="tdot"></div><div class="tinfo"><h4><span data-i18n="cat_lbl_moderate">Moderate</span> &nbsp;(51–100)</h4> <p data-i18n="cat_moderate">Dapat diterima, kecuali yang sensitif</p></div></div>
+      <div class="tier tpo"><div class="tdot"></div><div class="tinfo"><h4><span data-i18n="cat_lbl_poor">Poor</span> &nbsp;(101–150)</h4>    <p data-i18n="cat_poor">Tidak sehat bagi kelompok sensitif</p></div></div>
+      <div class="tier tu"> <div class="tdot"></div><div class="tinfo"><h4><span data-i18n="cat_lbl_unhealthy">Unhealthy</span> &nbsp;(151–200)</h4><p data-i18n="cat_unhealthy">Berbahaya bagi semua orang</p></div></div>
+      <div class="tier tsv"><div class="tdot"></div><div class="tinfo"><h4><span data-i18n="cat_lbl_severe">Severe</span> &nbsp;(201–300)</h4>  <p data-i18n="cat_severe">Bahaya tinggi, hindari luar ruangan</p></div></div>
+      <div class="tier th"> <div class="tdot"></div><div class="tinfo"><h4><span data-i18n="cat_lbl_hazardous">Hazardous</span> &nbsp;(&gt;300)</h4><p data-i18n="cat_hazardous">Darurat — hindari semua aktivitas luar</p></div></div>
+    </div>
+  </div>
+
+  <!-- SMART RECOMMENDATION — dipindah ke bawah grafik -->
+  <div class="rec-card" id="rec-card">
+    <div class="rec-hdr">
+      <div class="rec-hdr-ico"><i class="fas fa-lightbulb"></i></div>
+      <div>
+        <div class="rec-hdr-title" data-i18n="rec_title">Rekomendasi Cerdas</div>
+        <div class="rec-hdr-sub" data-i18n="rec_sub">Berdasarkan kondisi udara, suhu, dan kelembapan saat ini</div>
+      </div>
+    </div>
+    <div class="rec-list" id="rec-list">
+      <div class="rec-item"><div class="rec-num p1">1</div><div class="rec-ico">💨</div><div class="rec-txt">Memuat data sensor…</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ======================================================
+     PAGE: SENSORS
+====================================================== -->
+<div class="page" id="page-sensors">
+  <div class="ph"><div class="ph-title" data-i18n="sensors_title">Connected Sensors</div><div class="ph-desc" data-i18n="sensors_desc">Hardware sensor aktif — drag untuk melihat dari berbagai sudut</div></div>
+  <div class="sg">
+    <!-- MQ-135 -->
+    <div class="scard">
+      <div class="sensor-3d" id="s3d-mq135">
+        <div class="s-particle" style="width:5px;height:5px;background:#a78bfa;left:30%;top:60%;animation-duration:3.2s;animation-delay:0s;--tx:15px"></div>
+        <div class="s-particle" style="width:3px;height:3px;background:#c4b5fd;left:55%;top:70%;animation-duration:2.8s;animation-delay:0.8s;--tx:-10px"></div>
+        <div class="s-particle" style="width:4px;height:4px;background:#8b5cf6;left:70%;top:65%;animation-duration:3.5s;animation-delay:1.4s;--tx:8px"></div>
+        <div class="s-particle" style="width:3px;height:3px;background:#a78bfa;left:20%;top:75%;animation-duration:2.5s;animation-delay:2s;--tx:-12px"></div>
+        <div class="sensor-3d-inner" id="s3d-mq135-inner">
+          <img class="sensor-img" src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTQwIiBoZWlnaHQ9IjE0MCIgdmlld0JveD0iMCAwIDE0MCAxNDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PHJlY3QgeD0iMjAiIHk9IjcwIiB3aWR0aD0iMTAwIiBoZWlnaHQ9IjUwIiByeD0iNiIgZmlsbD0iIzFkNGVkOCIvPjxyZWN0IHg9IjMwIiB5PSI3NSIgd2lkdGg9IjgwIiBoZWlnaHQ9IjQwIiByeD0iNCIgZmlsbD0iIzI1NjNlYiIvPjxjaXJjbGUgY3g9IjcwIiBjeT0iNTAiIHI9IjI4IiBmaWxsPSIjNjc3NDhBIi8+PGNpcmNsZSBjeD0iNzAiIGN5PSI1MCIgcj0iMjIiIGZpbGw9IiM0QjU1NjMiLz48Y2lyY2xlIGN4PSI3MCIgY3k9IjUwIiByPSIxNiIgZmlsbD0iIzM3NDE1MSIvPjxsaW5lIHgxPSI0MiIgeTE9IjUwIiB4Mj0iNTQiIHkyPSI1MCIgc3Ryb2tlPSIjOTFBM0IwIiBzdHJva2Utd2lkdGg9IjIiLz48bGluZSB4MT0iODYiIHkxPSI1MCIgeDI9Ijk4IiB5Mj0iNTAiIHN0cm9rZT0iIzkxQTNCMCIgc3Ryb2tlLXdpZHRoPSIyIi8+PGxpbmUgeDE9IjcwIiB5MT0iMjIiIHgyPSI3MCIgeTI9IjM0IiBzdHJva2U9IiM5MUEzQjAiIHN0cm9rZS13aWR0aD0iMiIvPjxsaW5lIHgxPSI3MCIgeTE9IjY2IiB4Mj0iNzAiIHkyPSI3OCIgc3Ryb2tlPSIjOTFBM0IwIiBzdHJva2Utd2lkdGg9IjIiLz48dGV4dCB4PSI3MCIgeT0iNTUiIGZvbnQtc2l6ZT0iOCIgZmlsbD0iI0U1RTdFQiIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC1mYW1pbHk9Im1vbm9zcGFjZSI+TVEtMTM1PC90ZXh0PjxyZWN0IHg9IjQwIiB5PSI4NSIgd2lkdGg9IjEwIiBoZWlnaHQ9IjMwIiByeD0iMiIgZmlsbD0iI0I0QjhDMSIvPjxyZWN0IHg9IjU4IiB5PSI4NSIgd2lkdGg9IjEwIiBoZWlnaHQ9IjMwIiByeD0iMiIgZmlsbD0iI0I0QjhDMSIvPjxyZWN0IHg9Ijc2IiB5PSI4NSIgd2lkdGg9IjEwIiBoZWlnaHQ9IjMwIiByeD0iMiIgZmlsbD0iI0I0QjhDMSIvPjxyZWN0IHg9Ijk0IiB5PSI4NSIgd2lkdGg9IjEwIiBoZWlnaHQ9IjMwIiByeD0iMiIgZmlsbD0iI0I0QjhDMSIvPjwvc3ZnPg==" alt="MQ-135">
+        </div>
+        <div class="sensor-3d-hint"><i class="fas fa-hand-pointer"></i> <span data-i18n="drag_rotate">Drag to rotate</span></div>
+      </div>
+      <div class="sc-head">
+        <div class="sc-ava vio"><i class="fas fa-smog"></i></div>
+        <div>
+          <div class="sc-name">MQ-135</div>
+          <div class="sc-model" data-i18n="mq_model">Gas Quality Sensor</div>
+          <div class="sonline"><span class="sdot"></span><span data-i18n="status_online">Online</span></div>
+        </div>
+      </div>
+      <div class="sdiv"></div>
+      <div class="svals">
+        <div class="sval"><div class="svlbl" data-i18n="lbl_gas_short">Indeks Gas</div><div class="svval violet" id="s-gas">-- <span class="svunit">PPM</span></div></div>
+        <div class="sval"><div class="svlbl" data-i18n="lbl_status">Status</div><div class="svval" id="s-gas-status" style="font-size:14px">--</div></div>
+      </div>
+      <div class="sdiv"></div>
+      <div class="sdesc"><div class="sdlbl" data-i18n="about_sensor">Tentang Sensor</div><div class="sdtxt" data-i18n="mq_desc">MQ-135 mendeteksi gas berbahaya seperti amonia (NH₃), nitrogen oksida, alkohol, benzena, CO₂, dan asap. Ideal untuk monitoring kualitas udara ruangan laboratorium dan koridor.</div></div>
+      <div class="specs"><div class="spec">⚡ 5V DC</div><div class="spec">📡 Analog</div><div class="spec">🎯 0–500 Indeks</div><div class="spec">🌡 −20~70°C</div></div>
+    </div>
+
+    <!-- DHT11 -->
+    <div class="scard">
+      <div class="sensor-3d" id="s3d-dht11">
+        <div class="s-particle" style="width:4px;height:4px;background:#38bdf8;left:35%;top:62%;animation-duration:3s;animation-delay:0.3s;--tx:12px"></div>
+        <div class="s-particle" style="width:5px;height:5px;background:#7dd3fc;left:60%;top:72%;animation-duration:3.4s;animation-delay:1.2s;--tx:-8px"></div>
+        <div class="s-particle" style="width:3px;height:3px;background:#0ea5e9;left:50%;top:68%;animation-duration:2.7s;animation-delay:2.2s;--tx:16px"></div>
+        <div class="sensor-3d-inner" id="s3d-dht11-inner">
+          <img class="sensor-img" src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTQwIiBoZWlnaHQ9IjE0MCIgdmlld0JveD0iMCAwIDE0MCAxNDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PHJlY3QgeD0iMjAiIHk9IjMwIiB3aWR0aD0iMTAwIiBoZWlnaHQ9IjgwIiByeD0iOCIgZmlsbD0iIzE1M0E2NCIvPjxyZWN0IHg9IjMwIiB5PSIzNSIgd2lkdGg9IjgwIiBoZWlnaHQ9IjQ0IiByeD0iNiIgZmlsbD0iIzFFNTBBMiIvPjxyZWN0IHg9IjM1IiB5PSI0MCIgd2lkdGg9IjcwIiBoZWlnaHQ9IjMwIiByeD0iMyIgZmlsbD0iIzJBNjVDNCIvPjxyZWN0IHg9IjQwIiB5PSI0NSIgd2lkdGg9IjYwIiBoZWlnaHQ9IjIyIiByeD0iMiIgZmlsbD0iIzFCNEVCOCIvPjx0ZXh0IHg9IjcwIiB5PSI2MCIgZm9udC1zaXplPSI5IiBmaWxsPSIjQ0ZERUZGIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0ibW9ub3NwYWNlIiBmb250LXdlaWdodD0iYm9sZCI+REhUMTE8L3RleHQ+PHJlY3QgeD0iNDIiIHk9Ijc4IiB3aWR0aD0iMTQiIGhlaWdodD0iMzIiIHJ4PSIzIiBmaWxsPSIjNkI3MjgwIi8+PHJlY3QgeD0iNjMiIHk9Ijc4IiB3aWR0aD0iMTQiIGhlaWdodD0iMzIiIHJ4PSIzIiBmaWxsPSIjNkI3MjgwIi8+PHJlY3QgeD0iODQiIHk9Ijc4IiB3aWR0aD0iMTQiIGhlaWdodD0iMzIiIHJ4PSIzIiBmaWxsPSIjNkI3MjgwIi8+PHJlY3QgeD0iMjAiIHk9IjMwIiB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwIiByeD0iOCIgZmlsbD0iIzFBN0Y5NiIvPjwvc3ZnPg==" alt="DHT11">
+        </div>
+        <div class="sensor-3d-hint"><i class="fas fa-hand-pointer"></i> <span data-i18n="drag_rotate">Drag to rotate</span></div>
+      </div>
+      <div class="sc-head">
+        <div class="sc-ava sky"><i class="fas fa-temperature-half"></i></div>
+        <div>
+          <div class="sc-name">DHT11</div>
+          <div class="sc-model" data-i18n="dht_model">Temperature &amp; Humidity Sensor</div>
+          <div class="sonline"><span class="sdot"></span><span data-i18n="status_online">Online</span></div>
+        </div>
+      </div>
+      <div class="sdiv"></div>
+      <div class="svals">
+        <div class="sval"><div class="svlbl" data-i18n="lbl_temperature">Temperature</div><div class="svval orange" id="s-temp">-- <span class="svunit">°C</span></div></div>
+        <div class="sval"><div class="svlbl" data-i18n="lbl_humidity">Humidity</div><div class="svval sky" id="s-hum">-- <span class="svunit">%</span></div></div>
+      </div>
+      <div class="sdiv"></div>
+      <div class="sdesc"><div class="sdlbl" data-i18n="about_sensor">Tentang Sensor</div><div class="sdtxt" data-i18n="dht_desc">DHT11 mengukur suhu dan kelembapan secara bersamaan melalui sinyal digital satu kabel. Mudah diintegrasikan dengan ESP8266/ESP32 dan Arduino untuk monitoring lingkungan.</div></div>
+      <div class="specs"><div class="spec">⚡ 3.3–5V DC</div><div class="spec">📡 Digital</div><div class="spec">🌡 0~50°C</div><div class="spec">💧 20~90% RH</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ======================================================
+     PAGE: HISTORY
+====================================================== -->
+<div class="page" id="page-history">
+  <div class="ph"><div class="ph-title" data-i18n="hist_title">Data History</div><div class="ph-desc" data-i18n="hist_desc">Riwayat per jam — data >3 hari otomatis dihapus</div></div>
+  <div class="hist-filter">
+    <div class="hist-filter-pills">
+      <div class="fchip act"  data-f="All"       data-i18n="f_all">Semua</div>
+      <div class="fchip" data-f="Good" data-i18n="cat_lbl_good">Good</div>
+      <div class="fchip" data-f="Moderate" data-i18n="cat_lbl_moderate">Moderate</div>
+      <div class="fchip" data-f="Poor" data-i18n="cat_lbl_poor">Poor</div>
+      <div class="fchip" data-f="Unhealthy" data-i18n="cat_lbl_unhealthy">Unhealthy</div>
+      <div class="fchip" data-f="Severe" data-i18n="cat_lbl_severe">Severe</div>
+      <div class="fchip" data-f="Hazardous" data-i18n="cat_lbl_hazardous">Hazardous</div>
+    </div>
+    <select class="hist-date-sel" id="hist-date-sel">
+      <option value="all"       data-i18n="d_all">All Days</option>
+      <option value="today"     data-i18n="d_today">Hari Ini</option>
+      <option value="yesterday" data-i18n="d_yesterday">Kemarin</option>
+      <option value="2days"     data-i18n="d_2days">2 Hari Lalu</option>
+      <option value="3days"     data-i18n="d_3days">3 Hari Lalu</option>
+    </select>
+  </div>
+  <div class="hist-list" id="hist-list">
+    <div class="loading-row shimmer"></div>
+    <div class="loading-row shimmer" style="opacity:.6;margin-top:8px"></div>
+    <div class="loading-row shimmer" style="opacity:.35;margin-top:8px"></div>
+  </div>
+</div>
+
+<!-- ======================================================
+     PAGE: ALERTS
+====================================================== -->
+<div class="page" id="page-alerts">
+  <div class="ph"><div class="ph-title" data-i18n="alerts_title">Alerts</div><div class="ph-desc" data-i18n="alerts_desc">Peringatan kondisi Poor / Unhealthy / Severe / Hazardous</div></div>
+  <div id="alert-container">
+    <div class="hist-list" id="alert-list"><div class="loading-row shimmer"></div></div>
+  </div>
+</div>
+
+<!-- ======================================================
+     PAGE: CONFIG
+====================================================== -->
+<div class="page" id="page-config">
+  <div class="ph"><div class="ph-title" data-i18n="cfg_title">Configuration</div><div class="ph-desc" data-i18n="cfg_desc">Detail konfigurasi hardware, jaringan, threshold, dan status sistem</div></div>
+  <div class="cfg-grid">
+    <div class="cfg-card">
+      <div class="cfg-title"><i class="fas fa-microchip"></i> <span data-i18n="cfg_hardware">Hardware</span></div>
+      <div class="cfg-row"><span class="cfg-k">Microcontroller</span><span class="cfg-v">ESP8266 NodeMCU</span></div>
+      <div class="cfg-row"><span class="cfg-k">Sensor Suhu/Hum</span><span class="cfg-v">DHT11 (Pin D4)</span></div>
+      <div class="cfg-row"><span class="cfg-k">Sensor Gas</span><span class="cfg-v">MQ-135 (Pin A0)</span></div>
+      <div class="cfg-row"><span class="cfg-k">Baud Rate</span><span class="cfg-v">9600</span></div>
+      <div class="cfg-row"><span class="cfg-k">Power Supply</span><span class="cfg-v">5V USB</span></div>
+    </div>
+    <div class="cfg-card">
+      <div class="cfg-title"><i class="fas fa-wifi"></i> <span data-i18n="cfg_network">Network</span></div>
+      <div class="cfg-row"><span class="cfg-k">SSID</span><span class="cfg-v">PRODI INF</span></div>
+      <div class="cfg-row"><span class="cfg-k">Protocol</span><span class="cfg-v">HTTP/1.1</span></div>
+      <div class="cfg-row"><span class="cfg-k">Web Server Port</span><span class="cfg-v">80</span></div>
+      <div class="cfg-row"><span class="cfg-k">Data Endpoint</span><span class="cfg-v">/data</span></div>
+      <div class="cfg-row"><span class="cfg-k">PHP Server IP</span><span class="cfg-v">192.168.0.108</span></div>
+    </div>
+    <div class="cfg-card">
+      <div class="cfg-title"><i class="fas fa-sliders-h"></i> <span data-i18n="cfg_thresh_gas">Threshold Kualitas Udara (MQ-135)</span></div>
+      <div class="cfg-row"><span class="cfg-k" data-i18n="cat_lbl_good">Good</span>      <span class="cfg-v g">0 – 50 &nbsp;PPM</span></div>
+      <div class="cfg-row"><span class="cfg-k" data-i18n="cat_lbl_moderate">Moderate</span> <span class="cfg-v o">51 – 100 PPM</span></div>
+      <div class="cfg-row"><span class="cfg-k" data-i18n="cat_lbl_poor">Poor</span>      <span class="cfg-v o">101 – 150 PPM</span></div>
+      <div class="cfg-row"><span class="cfg-k" data-i18n="cat_lbl_unhealthy">Unhealthy</span><span class="cfg-v r">151 – 200 PPM</span></div>
+      <div class="cfg-row"><span class="cfg-k" data-i18n="cat_lbl_severe">Severe</span>   <span class="cfg-v p">201 – 300 PPM</span></div>
+      <div class="cfg-row"><span class="cfg-k" data-i18n="cat_lbl_hazardous">Hazardous</span><span class="cfg-v dk">&gt; 300 PPM</span></div>
+    </div>
+    <div class="cfg-card">
+      <div class="cfg-title"><i class="fas fa-thermometer-half"></i> <span data-i18n="cfg_thresh_temp">Threshold Suhu (DHT11)</span></div>
+      <div class="cfg-row"><span class="cfg-k" data-i18n="temp_freezing">Freezing</span>   <span class="cfg-v">0 – 0.9°C</span></div>
+      <div class="cfg-row"><span class="cfg-k" data-i18n="temp_chilly">Chilly</span>     <span class="cfg-v">1 – 10.9°C</span></div>
+      <div class="cfg-row"><span class="cfg-k" data-i18n="temp_cool">Cool</span>       <span class="cfg-v">11 – 20.9°C</span></div>
+      <div class="cfg-row"><span class="cfg-k" data-i18n="temp_pleasant">Pleasant</span>   <span class="cfg-v g">21 – 30.9°C</span></div>
+      <div class="cfg-row"><span class="cfg-k" data-i18n="temp_hot">Hot</span>        <span class="cfg-v o">31 – 40.9°C</span></div>
+      <div class="cfg-row"><span class="cfg-k" data-i18n="temp_extremehot">Extreme Hot</span><span class="cfg-v r">&gt; 41°C</span></div>
+    </div>
+    <div class="cfg-card">
+      <div class="cfg-title"><i class="fas fa-tint"></i> <span data-i18n="cfg_thresh_hum">Threshold Kelembapan (DHT11)</span></div>
+      <div class="cfg-row"><span class="cfg-k" data-i18n="hum_dry">Too Dry</span>  <span class="cfg-v r">&lt; 30%</span></div>
+      <div class="cfg-row"><span class="cfg-k" data-i18n="hum_optimal">Optimal</span>  <span class="cfg-v g">30 – 60%</span></div>
+      <div class="cfg-row"><span class="cfg-k" data-i18n="hum_humid">Too Humid</span><span class="cfg-v o">&gt; 60%</span></div>
+    </div>
+    <div class="cfg-card">
+      <div class="cfg-title"><i class="fas fa-heartbeat"></i> <span data-i18n="cfg_status">System Status</span></div>
+      <div class="cfg-row"><span class="cfg-k">Device</span>      <span id="cfg-device"  class="status-dot online"><span class="dot"></span>Online</span></div>
+      <div class="cfg-row"><span class="cfg-k">Database</span>    <span id="cfg-db"      class="status-dot online"><span class="dot"></span>Online</span></div>
+      <div class="cfg-row"><span class="cfg-k">Sensor MQ-135</span><span id="cfg-mq"   class="status-dot online"><span class="dot"></span>Online</span></div>
+      <div class="cfg-row"><span class="cfg-k">Sensor DHT11</span><span id="cfg-dht"   class="status-dot online"><span class="dot"></span>Online</span></div>
+      <div class="cfg-row"><span class="cfg-k">Last Update</span><span class="cfg-v" id="cfg-lastupdate">--</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- ======================================================
+     PAGE: ABOUT
+====================================================== -->
+<div class="page" id="page-about">
+  <div class="about-hero">
+    <div class="about-logo"><i class="fas fa-wind"></i></div>
+    <div class="about-title" data-i18n="about_title">Sistem Monitoring Kualitas Udara</div>
+    <div class="about-desc" data-i18n="about_desc">Dirancang untuk membantu sivitas akademika dan masyarakat memantau kualitas udara area indoor maupun outdoor secara real-time menggunakan teknologi IoT.</div>
+  </div>
+  <div class="about-grid">
+    <div class="acard"><div class="acard-ico ai-ind"><i class="fas fa-graduation-cap"></i></div><h4 data-i18n="about_kp_title">Kerja Praktik IoT</h4><p data-i18n="about_kp_desc">Project KP berbasis Internet of Things dengan implementasi sensor lingkungan dan web dashboard real-time.</p></div>
+    <div class="acard"><div class="acard-ico ai-grn"><i class="fas fa-university"></i></div><h4 data-i18n="about_univ_title">Informatika Untan</h4><p data-i18n="about_univ_desc">Dirancang untuk membantu sivitas akademika memantau kualitas udara di ruang lab dan koridor Informatika Untan.</p></div>
+    <div class="acard"><div class="acard-ico ai-vio"><i class="fas fa-microchip"></i></div><h4 data-i18n="about_hw_title">ESP8266 + Sensor</h4><p data-i18n="about_hw_desc">Hardware menggunakan NodeMCU ESP8266 dengan sensor MQ-135 (gas) dan DHT11 (suhu &amp; kelembapan).</p></div>
+  </div>
+</div>
+
+</div><!-- /content -->
+</div><!-- /wrap -->
+
+<!-- MOBILE BOTTOM NAV -->
+<div class="bottom-nav" id="bottom-nav">
+  <div class="bn-item active" data-page="dashboard"><i class="fas fa-chart-line"></i><span data-i18n="nav_dashboard">Dashboard</span></div>
+  <div class="bn-item" data-page="sensors"><i class="fas fa-microchip"></i><span data-i18n="nav_sensors">Sensors</span></div>
+  <div class="bn-item" data-page="history"><i class="fas fa-history"></i><span data-i18n="nav_history">History</span></div>
+  <div class="bn-item" data-page="alerts"><i class="fas fa-bell"></i><span data-i18n="nav_alerts">Alerts</span></div>
+  <div class="bn-item" data-page="config"><i class="fas fa-cog"></i><span data-i18n="nav_config">Config</span></div>
+</div>
+
+</body>
+</html>
